@@ -162,7 +162,7 @@ function startAutoScan() {
     captureFrame();
 
     // Une frame par seconde pour le test
-    scanTimer = setInterval(captureFrame, 1000);
+   scanTimer = setInterval(captureFrame, 200);
 }
 
 // ===============================
