@@ -18,6 +18,10 @@ const plateList = document.getElementById("plateList");
 let cameraStream = null;
 let scanTimer = null;
 let frameCount = 0;
+let lastPreviewTime = 0;
+
+const CAPTURE_INTERVAL = 200; // 5 frames/seconde
+const PREVIEW_INTERVAL = 1000; // 1 aperçu/seconde
 
 const scanCanvas = document.createElement("canvas");
 const scanContext = scanCanvas.getContext("2d");
@@ -57,7 +61,6 @@ async function startCamera() {
         statusText.textContent = "Caméra active";
         stopBtn.disabled = false;
 
-        // Démarrer automatiquement la capture
         startAutoScan();
 
     } catch (error) {
@@ -107,15 +110,21 @@ function captureFrame() {
         return;
     }
 
-    // Réduire la taille pour le prototype
+    // Réduire la résolution pour le prototype
     const width = 640;
     const height = Math.round(
         camera.videoHeight * width / camera.videoWidth
     );
 
-    scanCanvas.width = width;
-    scanCanvas.height = height;
+    if (
+        scanCanvas.width !== width ||
+        scanCanvas.height !== height
+    ) {
+        scanCanvas.width = width;
+        scanCanvas.height = height;
+    }
 
+    // Capture de la frame actuelle
     scanContext.drawImage(
         camera,
         0,
@@ -126,26 +135,43 @@ function captureFrame() {
 
     frameCount++;
 
-    // Afficher uniquement la dernière image capturée
+    // Afficher une seule image chaque seconde
+    const now = Date.now();
+
+    if (now - lastPreviewTime < PREVIEW_INTERVAL) {
+        return;
+    }
+
+    lastPreviewTime = now;
+
+    updatePreview();
+}
+
+// ===============================
+// UPDATE PREVIEW
+// ===============================
+
+function updatePreview() {
+
     const imageURL = scanCanvas.toDataURL(
         "image/jpeg",
         0.7
     );
 
     const preview = document.createElement("img");
+
     preview.src = imageURL;
     preview.alt = "Dernière frame capturée";
     preview.style.width = "100%";
     preview.style.marginTop = "10px";
     preview.style.borderRadius = "8px";
 
-    plateList.replaceChildren();
-
     const counter = document.createElement("p");
+
     counter.textContent =
         "Frames capturées : " + frameCount;
 
-    plateList.append(counter, preview);
+    plateList.replaceChildren(counter, preview);
 }
 
 // ===============================
@@ -157,12 +183,15 @@ function startAutoScan() {
     if (scanTimer !== null) return;
 
     frameCount = 0;
+    lastPreviewTime = 0;
 
-    // Capture immédiate
     captureFrame();
 
-    // Une frame par seconde pour le test
-   scanTimer = setInterval(captureFrame, 200);
+    // Capture toutes les 200 ms
+    scanTimer = setInterval(
+        captureFrame,
+        CAPTURE_INTERVAL
+    );
 }
 
 // ===============================
@@ -206,5 +235,5 @@ function stopCamera() {
 startBtn.addEventListener("click", startCamera);
 stopBtn.addEventListener("click", stopCamera);
 
-// Arrêter la caméra et la capture à la fermeture
+// Libérer la caméra à la fermeture de la page
 window.addEventListener("pagehide", stopCamera);
