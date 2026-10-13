@@ -20,7 +20,7 @@ const PREVIEW_INTERVAL = 1000;     // 1 aperçu/seconde
 const DETECTION_INTERVAL = 1500;   // 1 détection / 1.5s
 
 const MODEL_SIZE = 640;
-const CONFIDENCE_THRESHOLD = 0.45;
+const CONFIDENCE_THRESHOLD = 0.25;
 const NMS_THRESHOLD = 0.45;
 
 // =====================================
