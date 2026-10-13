@@ -4,12 +4,19 @@
 
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
     <title>Auto Scan - Camera Live</title>
 
+    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
+
+    <!-- ONNX Runtime Web -->
+    <script src="libs/ort.min.js" defer></script>
+
+    <!-- Auto Scan JavaScript -->
     <script src="app.js" defer></script>
 </head>
 
@@ -49,7 +56,9 @@
                 Start Camera
             </button>
 
-            <button id="stopCamera" type="button" disabled>
+            <button id="stopCamera"
+                    type="button"
+                    disabled>
                 Stop Camera
             </button>
 
